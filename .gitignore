@@ -1,0 +1,16 @@
+/bin
+
+# IDE stuff
+/.project
+/.classpath
+/.settings
+/.buildpath
+/.checkstyle
+/.idea
+/MineVive.iml
+
+# maven
+/target
+
+# Mac stuff
+.DS_Store
