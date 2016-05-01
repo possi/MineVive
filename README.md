@@ -20,13 +20,16 @@ This Plugin allows you to setup a Spigot 1.7 Minecraft-Server to use with [Minec
    You're done. Minecrive-Vive can connect to your server and use teleporting-locomotion.
 
 
-### Who does it work?
+### How does it work?
 
 The whole credit goes to Automat's impressive work of implementing Vive-Support into Minecraft!
 
 There are only 2 small obstacles to use this on usual Minecraft-Servers:
+
 1. Minecraft usual limits the distance a player can move in a *blink*. Thanks to Spigot, this threshold can be modified ([md_5](https://github.com/md-5) is awesome!)
-2. minecrift-vive asks the Server if teleport-motion is allowed, or otherwise falls back to *normal*-movement. This Plugin just response with "go for it", so minecrift-vive keeps teleporting-motion activated. Thats all.
+   The Limits 10 and 1000.0 seems to be enough for now. I have no idea if they are way to huge. You may play with the limits to prevent Player from cheating.
+2. minecrift-vive asks the Server if teleport-motion is allowed, or otherwise falls back to *normal*-movement.
+   This Plugin just response with "go for it", so minecrift-vive keeps teleporting-motion activated. That's all.
 
 ### Benefit using Spigot:
 There are thousands of free Plugins which work with Bukkit (Spigot) 1.7 so you can create fantastic servers with lot more features!
