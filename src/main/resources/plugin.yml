@@ -1,5 +1,5 @@
 name: MineVive
 main: de.jaschastarke.minecraft.vive.MineVive
-version: 0.1
+version: 0.2
 depend:
   - ProtocolLib
