@@ -1,0 +1,8 @@
+# @see https://github.com/possi/MineVive/blob/master/src/main/resources/config.yml
+
+viveOnly:
+  ## Kick all Players not using Vive-Minecrift, so that only teleporting users are on the Server
+  enable: false
+
+  ## Kick-Message for Non-Vivers
+  message: "This Server requires you to use Minecrift for Vive: https://github.com/Automat-GH/minecrift"

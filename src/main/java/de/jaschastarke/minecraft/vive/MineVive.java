@@ -6,11 +6,11 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.injector.PacketConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,9 +35,7 @@ public class MineVive extends JavaPlugin implements Listener {
                  * but that would be a little overkill for just 2 lines:
                  */
                 String customPayloadTag = event.getPacket().getStrings().readSafely(0);
-                String customPayloadData = new String(event.getPacket().getByteArrays().readSafely(0));
-                Bukkit.getLogger().info("DEBUG: CUSTOM PAYLOAD TAG: " + customPayloadTag);
-                Bukkit.getLogger().info("DEBUG: CUSTOM PAYLOAD DATA: " + customPayloadData);
+                //String customPayloadData = new String(event.getPacket().getByteArrays().readSafely(0));
                 if (customPayloadTag.equals(REQUEST_PAYLOAD_TAG)) {
                     PacketContainer responsePacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.CUSTOM_PAYLOAD);
                     responsePacket.getModifier().writeDefaults();
@@ -55,6 +53,7 @@ public class MineVive extends JavaPlugin implements Listener {
         };
     }
     public void onEnable() {
+        this.saveDefaultConfig();
         ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
         getServer().getPluginManager().registerEvents(this, this);
     }
@@ -62,6 +61,20 @@ public class MineVive extends JavaPlugin implements Listener {
         ProtocolLibrary.getProtocolManager().removePacketListener(adapter);
     }
 
+    @EventHandler
+    public void onPlayerConnect(PlayerJoinEvent event) {
+        final Player p = event.getPlayer();
+        if (this.getConfig().getBoolean("viveOnly.enable")) {
+            this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    if (p.isOnline() && !onlineVivers.contains(p)) {
+                        p.kickPlayer(MineVive.this.getConfig().getString("viveOnly.message"));
+                    }
+                }
+            }, 10L);
+        }
+    }
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {
         onlineVivers.remove(event.getPlayer());
