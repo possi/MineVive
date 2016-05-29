@@ -24,9 +24,12 @@ public class MineVive extends JavaPlugin implements Listener {
     private static final String RESPONSE_PAYLOAD_TAG = "MC|ViveOK";
     private static final String RESPONSE_PAYLOAD_DATA = "/u/jpossi";
     private final PacketAdapter adapter;
+    private final AlwaysItem alwaysItem;
     private Set<Player> onlineVivers = new HashSet<Player>();
 
     public MineVive() {
+        this.alwaysItem = new AlwaysItem(this);
+
         adapter = new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Client.CUSTOM_PAYLOAD) {
             @Override
             public void onPacketReceiving(PacketEvent event) {
@@ -56,9 +59,11 @@ public class MineVive extends JavaPlugin implements Listener {
         this.saveDefaultConfig();
         ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
         getServer().getPluginManager().registerEvents(this, this);
+        alwaysItem.onEnable();
     }
     public void onDisable() {
         ProtocolLibrary.getProtocolManager().removePacketListener(adapter);
+        alwaysItem.onDisable();
     }
 
     @EventHandler

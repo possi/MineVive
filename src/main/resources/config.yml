@@ -6,3 +6,11 @@ viveOnly:
 
   ## Kick-Message for Non-Vivers
   message: "This Server requires you to use Minecrift for Vive: https://github.com/Automat-GH/minecrift"
+
+## Give player this Items always (but only one time)
+alwaysItem:
+  # e.g. "MAP" for Map (@see https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/Material.java)
+  item:
+
+  # e.G. Map-Id
+  data:
