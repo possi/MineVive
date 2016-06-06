@@ -14,3 +14,32 @@ alwaysItem:
 
   # e.G. Map-Id
   data:
+
+## Sets Prefix to Player names (Doesn't work yet with Essentials Display Names or Permissions Prefixes)
+prefix:
+  ## Prefix for Players using Minecrift for Vive
+  ## Example: "&4[Vive]&r "
+  vive:
+
+  ## Prefix for all other Players (Classic users)
+  vanilla:
+
+## Groups a Player will be added to (additional to groups he already has)
+## This requires Vault and a supported Permission-Plugin with Multi-Group-Support (e.g. PermissionEx)
+groups:
+  ## Group for Players using Minecrift for Vive
+  vive:
+
+  ## Group for Non-Vive-Players
+  vanilla:
+
+  ## Group for Non-Teleporting-Movement (in Addition to vive-Group)
+  ## Assumen that all Players are using teleportation by default, because of that there is no Teleporting-Group
+  freemove:
+
+## Disable PVP between Non-Vive and Vive-Players
+pvp:
+  sameTypeOnly: false
+
+  ## Also Prevent Splash-Potions (Healing Potions are prevented also)
+  preventPotion: true

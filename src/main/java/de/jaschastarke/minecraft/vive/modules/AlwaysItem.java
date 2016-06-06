@@ -1,4 +1,4 @@
-package de.jaschastarke.minecraft.vive;
+package de.jaschastarke.minecraft.vive.modules;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
