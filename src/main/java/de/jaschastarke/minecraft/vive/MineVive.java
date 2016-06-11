@@ -115,7 +115,7 @@ public class MineVive extends JavaPlugin implements Listener {
                     }
                 }
             }
-        }, 10L);
+        }, getConfig().getLong("viveOnly.waitTimeout", 10L));
     }
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {

@@ -7,6 +7,10 @@ viveOnly:
   ## Kick-Message for Non-Vivers
   message: "This Server requires you to use Minecrift for Vive: https://github.com/Automat-GH/minecrift"
 
+  ## The timeout before a non-vive player gets kicked. You may increase thit, if you assume false-positiv kicks
+  ## In ticks: so 10 is half a second. 20 for one second, 40 for two seconds, and so on
+  waitTimeout: 10
+
 ## Give player this Items always (but only one time)
 alwaysItem:
   # e.g. "MAP" for Map (@see https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/Material.java)
