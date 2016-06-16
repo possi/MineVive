@@ -39,4 +39,4 @@ By the way: Non-Vivers can join the Server too. They just need a usual 1.7 Clien
 
 ### Forge
 
-For Forge-Servers have a look at https://github.com/Techjar/MineViveForge
+For Forge-Servers have a look at https://github.com/Techjar/VivecraftForgeExtensions
