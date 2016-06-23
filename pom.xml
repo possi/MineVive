@@ -15,6 +15,26 @@
         <plib.version>1.7.0-SNAPSHOT</plib.version>
     </properties>
 
+    <scm>
+        <connection>scm:git:git://github.com/possi/MineVive.git</connection>
+        <developerConnection>scm:git:git@github.com:possi/MineVive.git</developerConnection>
+        <url>https://github.com/possi/MineVive/tree/plib</url>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>de-jas-repo</id>
+            <url>scp://repo@ja-s.de/var/customers/webs/repo/mvn</url>
+        </repository>
+    </distributionManagement>
+    <ciManagement>
+        <system>jenkins</system>
+        <url>http://ci.ja-s.de:8080/</url>
+    </ciManagement>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/possi/MineVive/issues</url>
+    </issueManagement>
+
     <repositories>
         <!-- Possible public Maven Repository, containing LimitedCreative builds and other dependencies without own rep.
              like AuthMe, etc.
