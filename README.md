@@ -36,3 +36,7 @@ There are thousands of free Plugins which work with Bukkit (Spigot) 1.7 so you c
 Here you go: http://dev.bukkit.org/categories/
 
 By the way: Non-Vivers can join the Server too. They just need a usual 1.7 Client, which official can be downloaded via the Launcher!
+
+### Forge
+
+For Forge-Servers have a look at https://github.com/Techjar/VivecraftForgeExtensions
