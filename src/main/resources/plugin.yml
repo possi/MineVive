@@ -1,7 +1,0 @@
-name: MineVive
-main: de.jaschastarke.minecraft.vive.MineVive
-version: 0.4
-depend:
-  - ProtocolLib
-softdepend:
-  - Vault

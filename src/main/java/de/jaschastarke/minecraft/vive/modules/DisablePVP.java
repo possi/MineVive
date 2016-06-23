@@ -1,6 +1,10 @@
 package de.jaschastarke.minecraft.vive.modules;
 
+import de.jaschastarke.bukkit.lib.CoreModule;
 import de.jaschastarke.minecraft.vive.MineVive;
+import de.jaschastarke.minecraft.vive.modules.pvp.DisablePVPConfig;
+import de.jaschastarke.modularize.IModule;
+import de.jaschastarke.modularize.ModuleEntry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -12,28 +16,26 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class DisablePVP implements Listener {
+public class DisablePVP extends CoreModule<MineVive> implements Listener {
     private static final String MSG_NO_PVP_VIVE = "You can only PVP with other VR Players";
     private static final String MSG_NO_PVP_CLASSIC = "You can't PVP with VR Players";
     private static final int MSG_TIMEOUT = 180;
-    private final MineVive plugin;
     private Map<Player, Long> timeout = new WeakHashMap<Player, Long>();
+    private DisablePVPConfig config;
 
 
     public DisablePVP(MineVive plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
-    public void onEnable() {
-        if (plugin.getConfig().getBoolean("pvp.sameTypeOnly", false))
-            plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    @Override
+    public void initialize(ModuleEntry<IModule> pEntry) {
+        super.initialize(pEntry);
+        config = plugin.getPluginConfig().registerSection(new DisablePVPConfig(this, entry));
     }
-    public void onDisable() {}
-
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageEvent rawevent) {
@@ -43,7 +45,7 @@ public class DisablePVP implements Listener {
             Entity source = event.getDamager();
             if (source instanceof Projectile) {
                 ProjectileSource shooter = ((Projectile) source).getShooter();
-                if (shooter instanceof Entity)
+                if (shooter != null)
                     source = (Entity) shooter;
             }
 
@@ -60,7 +62,7 @@ public class DisablePVP implements Listener {
     }
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(PotionSplashEvent event) {
-        if (plugin.getConfig().getBoolean("pvp.preventPotion") && event.getAffectedEntities().size() > 0) {
+        if (config.getPreventPotion() && event.getAffectedEntities().size() > 0) {
             if (event.getPotion().getShooter() instanceof Player) {
                 Player player = (Player) event.getPotion().getShooter();
                 for (LivingEntity entity : event.getAffectedEntities()) {
@@ -85,4 +87,5 @@ public class DisablePVP implements Listener {
             timeout.put(target, System.currentTimeMillis());
         }
     }
+
 }

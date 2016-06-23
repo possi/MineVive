@@ -1,7 +1,7 @@
-MineVive - Minecrift Vive Server-Essentials
+Vivecraft Spigot Plugin (MineVive)
 ===========================================
 
-This Plugin allows you to setup a Spigot 1.7 Minecraft-Server to use with [Minecraft-Vive](https://github.com/Automat-GH/minecrift).
+This Plugin allows you to setup a Spigot 1.7 Minecraft-Server to use with [Minecraft-Vive](https://github.com/jrbudda/minecrift).
 
 #### Server-Setup:
 1. Create an empty folder to setup the server (e.g. /opt/minecraft/vive/)
@@ -28,7 +28,7 @@ There are only 2 small obstacles to use this on usual Minecraft-Servers:
 
 1. Minecraft usual limits the distance a player can move in a *blink*. Thanks to Spigot, this threshold can be modified ([md_5](https://github.com/md-5) is awesome!)
    The Limits 10 and 1000.0 seems to be enough for now. I have no idea if they are way to huge. You may play with the limits to prevent Player from cheating.
-2. minecrift-vive asks the Server if teleport-motion is allowed, or otherwise falls back to *normal*-movement.
+2. minecrift-vive/vivecraft asks the Server if teleport-motion is allowed, or otherwise falls back to *normal*-movement.
    This Plugin just response with "go for it", so minecrift-vive keeps teleporting-motion activated. That's all.
 
 ### Benefit using Spigot:

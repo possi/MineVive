@@ -1,7 +1,11 @@
 package de.jaschastarke.minecraft.vive.modules;
 
+import de.jaschastarke.bukkit.lib.CoreModule;
+import de.jaschastarke.minecraft.vive.MineVive;
+import de.jaschastarke.minecraft.vive.modules.alwaysitem.AlwaysItemConfig;
+import de.jaschastarke.modularize.IModule;
+import de.jaschastarke.modularize.ModuleEntry;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,32 +15,43 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
-public class AlwaysItem implements Listener {
+public class AlwaysItem extends CoreModule<MineVive> implements Listener {
     private static final int LAST_HOTBAR_SLOT = 8;
-    private JavaPlugin plugin;
     private ItemStack itemStack;
+    private AlwaysItemConfig config;
 
-    public AlwaysItem(JavaPlugin plugin) {
-        this.plugin = plugin;
+    public AlwaysItem(MineVive plugin) {
+        super(plugin);
     }
 
+    @Override
+    public String getName() {
+        return "AlwayItem";
+    }
+
+    @Override
+    public void initialize(ModuleEntry<IModule> pEntry) {
+        super.initialize(pEntry);
+
+        config = plugin.getPluginConfig().registerSection(new AlwaysItemConfig(this, entry));
+        listeners.addListener(this);
+    }
+
+    @Override
     public void onEnable() {
-        String item = plugin.getConfig().getString("alwaysItem.item");
+        String item = config.getItem();
         if (item == null || item.length() == 0)
             return;
         Material itemType = Material.getMaterial(item);
         if (itemType == null) {
             plugin.getLogger().warning("Unknown Item-Type for alwaysItem.item: " + item);
+            getModuleEntry().deactivateUsage();
             return;
         }
 
-        itemStack = new ItemStack(itemType, 1, (short) 0, new Integer(plugin.getConfig().getInt("alwaysItem.data", 0)).byteValue());
-
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        itemStack = new ItemStack(itemType, 1, (short) 0, new Integer(config.getData()).byteValue());
     }
-    public void onDisable() {}
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -92,4 +107,5 @@ public class AlwaysItem implements Listener {
     protected boolean isTheItem(ItemStack is) {
         return is != null && is.getType().equals(itemStack.getType()) && is.getData().equals(itemStack.getData());
     }
+
 }
