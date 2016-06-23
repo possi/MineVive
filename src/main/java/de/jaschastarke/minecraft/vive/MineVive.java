@@ -30,6 +30,7 @@ public class MineVive extends Core {
         addModule(new AlwaysItem(this));
         addModule(new PermGroup(this));
         addModule(new DisablePVP(this));
+        addModule(new BowHeadshot(this));
         listeners.addListener(new DependencyListener(this));
 
         config.saveDefault();
