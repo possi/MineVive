@@ -41,6 +41,13 @@ public class PermGroup extends CoreModule<MineVive> implements Listener {
         vaultIntegraiont = new de.jaschastarke.minecraft.vive.modules.permissions.VaultIntegration(plugin);
     }
 
+    @Override
+    public void onEnable() {
+        super.onEnable();
+
+        getLog().info(plugin.getLang().trans("basic.loaded.module"));
+    }
+
     @EventHandler
     public void onVivePropertyChange(VivePropertyChangeEvent event) {
         PlayerProperties pp = event.getPlayerProperties();

@@ -51,6 +51,8 @@ public class AlwaysItem extends CoreModule<MineVive> implements Listener {
         }
 
         itemStack = new ItemStack(itemType, 1, (short) 0, new Integer(config.getData()).byteValue());
+
+        getLog().info(plugin.getLang().trans("basic.loaded.module"));
     }
 
     @EventHandler

@@ -12,6 +12,7 @@ import de.jaschastarke.minecraft.vive.Config;
 import de.jaschastarke.minecraft.vive.modules.ViveOnly;
 import de.jaschastarke.modularize.IModule;
 import de.jaschastarke.modularize.ModuleEntry;
+import org.bukkit.configuration.ConfigurationSection;
 
 @ArchiveDocComments
 @PluginConfigurations(parent = Config.class)
@@ -41,9 +42,15 @@ public class ViveOnlyConfig extends Configuration implements IConfigurationSubGr
 
     @Override
     public void setValue(IConfigurationNode node, Object pValue) throws InvalidValueException {
+        super.setValue(node, pValue);
         if (node.getName().equals("enabled") && entry != null) {
             entry.setEnabled(getEnabled());
         }
+    }
+    @Override
+    public void setValues(ConfigurationSection sect) {
+        super.setValues(sect);
+        entry.setDefaultEnabled(getEnabled());
     }
 
     /**

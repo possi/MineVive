@@ -12,6 +12,7 @@ import de.jaschastarke.minecraft.vive.Config;
 import de.jaschastarke.minecraft.vive.modules.AlwaysItem;
 import de.jaschastarke.modularize.IModule;
 import de.jaschastarke.modularize.ModuleEntry;
+import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Give player this Items always (but only one time)
@@ -42,9 +43,15 @@ public class AlwaysItemConfig extends Configuration implements IConfigurationSub
 
     @Override
     public void setValue(IConfigurationNode node, Object pValue) throws InvalidValueException {
+        super.setValue(node, pValue);
         if (node.getName().equals("item") && entry != null) {
             entry.setEnabled(getItem() != null && getItem().length() > 0);
         }
+    }
+    @Override
+    public void setValues(ConfigurationSection sect) {
+        super.setValues(sect);
+        entry.setDefaultEnabled(getItem() != null && getItem().length() > 0);
     }
 
     /**

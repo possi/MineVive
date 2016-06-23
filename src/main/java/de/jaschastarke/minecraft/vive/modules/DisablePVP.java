@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 public class DisablePVP extends CoreModule<MineVive> implements Listener {
-    private static final String MSG_NO_PVP_VIVE = "You can only PVP with other VR Players";
-    private static final String MSG_NO_PVP_CLASSIC = "You can't PVP with VR Players";
     private static final int MSG_TIMEOUT = 180;
     private Map<Player, Long> timeout = new WeakHashMap<Player, Long>();
     private DisablePVPConfig config;
@@ -54,8 +52,8 @@ public class DisablePVP extends CoreModule<MineVive> implements Listener {
                 Player target = (Player) event.getEntity();
                 if (plugin.isVivePlayer(player) != plugin.isVivePlayer(target)) {
                     event.setCancelled(true);
-                    msgPlayer(player, plugin.isVivePlayer(player) ? MSG_NO_PVP_VIVE : MSG_NO_PVP_CLASSIC);
-                    msgPlayer(target, plugin.isVivePlayer(target) ? MSG_NO_PVP_VIVE : MSG_NO_PVP_CLASSIC);
+                    msgPlayer(player, plugin.isVivePlayer(player) ? plugin.getLang().trans("pvp.no_vive") : plugin.getLang().trans("pvp.no_vanilla"));
+                    msgPlayer(target, plugin.isVivePlayer(target) ? plugin.getLang().trans("pvp.no_vive") : plugin.getLang().trans("pvp.no_vanilla"));
                 }
             }
         }
@@ -70,8 +68,8 @@ public class DisablePVP extends CoreModule<MineVive> implements Listener {
                         Player target = (Player) entity;
                         if (plugin.isVivePlayer(player) != plugin.isVivePlayer(target)) {
                             event.setIntensity(entity, 0);
-                            msgPlayer(player, plugin.isVivePlayer(player) ? MSG_NO_PVP_VIVE : MSG_NO_PVP_CLASSIC);
-                            msgPlayer(target, plugin.isVivePlayer(target) ? MSG_NO_PVP_VIVE : MSG_NO_PVP_CLASSIC);
+                            msgPlayer(player, plugin.isVivePlayer(player) ? plugin.getLang().trans("pvp.no_vive") : plugin.getLang().trans("pvp.no_vanilla"));
+                            msgPlayer(target, plugin.isVivePlayer(target) ? plugin.getLang().trans("pvp.no_vive") : plugin.getLang().trans("pvp.no_vanilla"));
                         }
                     }
                 }

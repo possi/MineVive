@@ -12,6 +12,7 @@ import de.jaschastarke.minecraft.vive.Config;
 import de.jaschastarke.minecraft.vive.modules.DisablePVP;
 import de.jaschastarke.modularize.IModule;
 import de.jaschastarke.modularize.ModuleEntry;
+import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Disable PVP between Non-Vive and Vive-Players
@@ -42,9 +43,15 @@ public class DisablePVPConfig extends Configuration implements IConfigurationSub
 
     @Override
     public void setValue(IConfigurationNode node, Object pValue) throws InvalidValueException {
+        super.setValue(node, pValue);
         if (node.getName().equals("sameTypeOnly") && entry != null) {
             entry.setEnabled(getSameTypeOnly());
         }
+    }
+    @Override
+    public void setValues(ConfigurationSection sect) {
+        super.setValues(sect);
+        entry.setDefaultEnabled(getSameTypeOnly());
     }
 
     @IsConfigurationNode(order = 100)

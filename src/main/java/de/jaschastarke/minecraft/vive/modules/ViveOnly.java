@@ -29,6 +29,13 @@ public class ViveOnly extends CoreModule<MineVive> implements Listener {
         config = plugin.getPluginConfig().registerSection(new ViveOnlyConfig(this, entry));
     }
 
+    @Override
+    public void onEnable() {
+        super.onEnable();
+
+        getLog().info(plugin.getLang().trans("basic.loaded.module"));
+    }
+
     @EventHandler
     public void onPlayerConnect(PlayerJoinEvent event) {
         final Player p = event.getPlayer();
@@ -43,4 +50,7 @@ public class ViveOnly extends CoreModule<MineVive> implements Listener {
         }, config.getWaitTimeout());
     }
 
+    public ViveOnlyConfig getConfig() {
+        return config;
+    }
 }

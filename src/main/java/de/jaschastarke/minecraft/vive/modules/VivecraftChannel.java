@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -107,6 +108,19 @@ public class VivecraftChannel extends CoreModule<MineVive> implements Listener {
         ProtocolLibrary.getProtocolManager().removePacketListener(adapter);
     }
 
+    @EventHandler
+    public void onPlayerConnect(PlayerJoinEvent event) {
+        final Player p = event.getPlayer();
+
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                if (p.isOnline() && !plugin.isVivePlayer(p)) {
+                    updatePlayer(p);
+                }
+            }
+        }, plugin.getModule(ViveOnly.class).getConfig().getWaitTimeout());
+    }
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {
         removePlayerProperties(event.getPlayer());
