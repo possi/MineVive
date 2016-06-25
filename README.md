@@ -1,7 +1,7 @@
 Vivecraft Spigot Plugin (MineVive)
 ===========================================
 
-This Plugin allows you to setup a Spigot 1.7 Minecraft-Server to use with [Minecraft-Vive](https://github.com/jrbudda/minecrift).
+This Plugin allows you to setup a Spigot 1.7 Minecraft-Server to use with [Vivecraft](https://github.com/jrbudda/minecrift).
 
 #### Server-Setup:
 1. Create an empty folder to setup the server (e.g. /opt/minecraft/vive/)
@@ -40,3 +40,11 @@ By the way: Non-Vivers can join the Server too. They just need a usual 1.7 Clien
 ### Forge
 
 For Forge-Servers have a look at https://github.com/Techjar/VivecraftForgeExtensions
+
+
+### Compiling / Development
+
+The newer version of this plugin uses my own Minecraft-Framework [plib](https://github.com/possi/plib/tree/1.7).
+You can compile everything using [Maven](https://maven.apache.org/): ```mvn clean package```
+Jenkins: http://ci.ja-s.de:8080/job/MineVive/
+Maven-Repo: http://repo.ja-s.de/mvn/

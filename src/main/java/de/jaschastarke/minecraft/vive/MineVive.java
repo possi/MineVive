@@ -4,6 +4,7 @@ import de.jaschastarke.bukkit.lib.Core;
 import de.jaschastarke.bukkit.lib.PluginLang;
 import de.jaschastarke.bukkit.lib.configuration.command.ConfigCommand;
 import de.jaschastarke.minecraft.vive.modules.*;
+import de.jaschastarke.minecraft.vive.modules.vivecraft.VivecraftChannel;
 import de.jaschastarke.utils.ClassDescriptorStorage;
 import org.bukkit.entity.Player;
 
@@ -44,7 +45,7 @@ public class MineVive extends Core {
         return getModule(VivecraftChannel.class).getPlayerViveProperties(player);
     }
     public boolean isVivePlayer(Player player) {
-        return getPlayerViveProperties(player) != null;
+        return getPlayerViveProperties(player) != null && getPlayerViveProperties(player).isVive();
     }
 
     public Config getPluginConfig() {
@@ -61,5 +62,10 @@ public class MineVive extends Core {
             cds.getResourceBundle().addResourceBundle("lang.doccomments");
         }
         return cds;
+    }
+
+    @Override
+    public boolean isDebug() {
+        return config.getDebug();
     }
 }

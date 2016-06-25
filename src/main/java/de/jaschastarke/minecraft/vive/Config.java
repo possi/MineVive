@@ -3,6 +3,7 @@ package de.jaschastarke.minecraft.vive;
 import de.jaschastarke.bukkit.lib.Core;
 import de.jaschastarke.bukkit.lib.configuration.ConfigurationContainer;
 import de.jaschastarke.bukkit.lib.configuration.PluginConfiguration;
+import de.jaschastarke.configuration.annotations.IsConfigurationNode;
 import de.jaschastarke.maven.ArchiveDocComments;
 import de.jaschastarke.maven.PluginConfigurations;
 
@@ -12,7 +13,7 @@ import de.jaschastarke.maven.PluginConfigurations;
  * This configuration-file is automatically written when changed via ingame-commands. So any manual added comments are
  * removed.
  *
- * @see [https://github.com/possi/MineVive/blob/master/src/main/resources/config.yml]
+ * See: http://ci.ja-s.de:8080/job/MineVive/lastSuccessfulBuild/artifact/target/default_config.yml
  */
 @ArchiveDocComments
 @PluginConfigurations
@@ -23,5 +24,17 @@ public class Config extends PluginConfiguration{
 
     public Config(Core plugin) {
         super(plugin);
+    }
+
+    /**
+     * Debug
+     *
+     * The debug modus spams much details about the plugin to the server-log (console) which can help to solve issues.
+     *
+     * default: false
+     */
+    @IsConfigurationNode(order = 9999)
+    public boolean getDebug() {
+        return config.getBoolean("debug", false);
     }
 }

@@ -2,7 +2,6 @@ package de.jaschastarke.minecraft.vive.modules.permissions;
 
 import de.jaschastarke.bukkit.lib.CoreModule;
 import de.jaschastarke.minecraft.vive.MineVive;
-import de.jaschastarke.minecraft.vive.modules.PlayerProperties;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -16,8 +15,6 @@ public class VaultIntegration extends CoreModule<MineVive> implements Permission
 
     @Override
     public void updatePlayerPermissionGroup(Player p, Map<String, Boolean> groups) {
-        PlayerProperties pp = plugin.getPlayerViveProperties(p);
-
         RegisteredServiceProvider<Permission> rsp = plugin.getServer().getServicesManager().getRegistration(Permission.class);
         Permission perm = rsp.getProvider();
         if (perm != null) {

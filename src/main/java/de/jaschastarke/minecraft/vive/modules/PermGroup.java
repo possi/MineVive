@@ -4,6 +4,7 @@ import de.jaschastarke.bukkit.lib.CoreModule;
 import de.jaschastarke.minecraft.vive.MineVive;
 import de.jaschastarke.minecraft.vive.modules.permissions.PermGroupConfig;
 import de.jaschastarke.minecraft.vive.modules.permissions.PermissionIntegration;
+import de.jaschastarke.minecraft.vive.modules.vivecraft.packet.VivecraftPlayerProperties;
 import de.jaschastarke.minecraft.vive.modules.vivecraft.VivePropertyChangeEvent;
 import de.jaschastarke.modularize.IModule;
 import de.jaschastarke.modularize.ModuleEntry;
@@ -50,7 +51,7 @@ public class PermGroup extends CoreModule<MineVive> implements Listener {
 
     @EventHandler
     public void onVivePropertyChange(VivePropertyChangeEvent event) {
-        PlayerProperties pp = event.getPlayerProperties();
+        VivecraftPlayerProperties pp = event.getPlayerProperties();
 
         Map<String, Boolean> groups = new HashMap<String, Boolean>();
 
