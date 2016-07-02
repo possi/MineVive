@@ -1,33 +1,45 @@
 package de.jaschastarke.minecraft.vive.modules;
 
+import de.jaschastarke.bukkit.lib.CoreModule;
 import de.jaschastarke.minecraft.vive.MineVive;
 import de.jaschastarke.minecraft.vive.PlayerProperties;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import de.jaschastarke.minecraft.vive.modules.longbow.LongbowConfig;
+import de.jaschastarke.modularize.IModule;
+import de.jaschastarke.modularize.ModuleEntry;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-public class BowHeadshot implements Listener {
-    private static final double DEFAULT_HEADSET_DISTANCE = 0.4;
-
-    private MineVive plugin;
+public class BowHeadshot extends CoreModule<MineVive> implements Listener {
+    private static final double DEFAULT_HEADSET_DISTANCE = 0.3;
+    private LongbowConfig config;
 
     public BowHeadshot(MineVive plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
-    public void onEnable() {
-        if (plugin.getConfig().getString("bow.headshot", "").length() <= 0)
-            return;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    @Override
+    public String getName() {
+        return "BowHeadshot";
     }
-    public void onDisable() {}
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        getLog().info(plugin.getLang().trans("basic.loaded.module"));
+    }
+
+    @Override
+    public void initialize(ModuleEntry<IModule> pEntry) {
+        super.initialize(pEntry);
+        config = plugin.getPluginConfig().registerSection(new LongbowConfig(this, entry));
+        listeners.addListener(this);
+    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onProjectileHit(EntityDamageByEntityEvent event) {
@@ -42,19 +54,23 @@ public class BowHeadshot implements Listener {
             final LivingEntity target = (LivingEntity) event.getEntity();
             final Location eyeloc = target.getEyeLocation();
             if (eyeloc != null) {
-                plugin.getLogger().info("DEBUG HEADSHOT FROM: "+arrow.getLocation().toString());
-                plugin.getLogger().info("DEBUG HEADSHOT TO  : "+eyeloc.toString() + "   eh: " + target.getEyeHeight());
-                //plugin.getLogger().info("DEBUG HEADSHOT DIST: "+distance + "  sqrt:" + eyeloc.distanceSquared(arrow.getLocation()) + " t:"+target.getType());
-                if (doesPierceHead(target, arrow.getLocation())) {
-                    plugin.getLogger().info("DEBUG HEADSHOT!!!");
+                //debugParticleLocation(eyeloc, Effect.FLAME);
+                //debugParticleLocation(eyeloc, Effect.HEART);
+                //debugParticleLocation(arrow.getLocation(), Effect.FLAME);
+                //debugParticleLocation(arrow.getLocation(), Effect.LAVA_POP);
+                getLog().debug("HEADSHOT FROM: "+arrow.getLocation().toString());
+                getLog().debug("HEADSHOT TO  : "+eyeloc.toString() + "   eh: " + target.getEyeHeight());
+                //getLog().debug("HEADSHOT DIST: "+distance + "  sqrt:" + eyeloc.distanceSquared(arrow.getLocation()) + " t:"+target.getType());
+                if (doesPierceHead(target, arrow.getLocation(), arrow.getVelocity())) {
+                    getLog().debug("HEADSHOT!!!");
                     final ItemStack helmet = target.getEquipment().getHelmet();
                     if (helmet != null && !helmet.getType().equals(Material.AIR)) {
-                        plugin.getLogger().info("DEBUG HEADSHOT: HAS HELMET: " + helmet.getType());
+                        getLog().debug("HEADSHOT: HAS HELMET: " + helmet.getType());
                         String s = plugin.getConfig().getString("bow.helmet");
-                        if (s != null && s.toUpperCase().equals("IGNORE")) {
+                        if (config.getHelmet().equals(LongbowConfig.RewardType.IGNORE)) {
                             return;
-                        } else if (s != null && s.toUpperCase().equals("DROP")) {
-                            plugin.getLogger().info("DEBUG HEADSHOT: HELMET DROP");
+                        } else if (config.getHelmet().equals(LongbowConfig.RewardType.DROP)) {
+                            getLog().debug("HEADSHOT: HELMET DROP");
                             helmet.setDurability((short) (helmet.getDurability() - 1));
                             if (helmet.getDurability() > 0)
                                 target.getWorld().dropItemNaturally(event.getEntity().getLocation(), helmet);
@@ -63,74 +79,150 @@ public class BowHeadshot implements Listener {
                         }
                     }
 
-                    String s = plugin.getConfig().getString("bow.headshot");
-                    if (s != null && s.toUpperCase().equals("CRITICAL")) {
-                        plugin.getLogger().info("DEBUG HEADSHOT: CRITICAL");
-                        arrow.setCritical(true);
-                    } else if (s != null && s.toUpperCase().equals("KILL")) {
-                        plugin.getLogger().info("DEBUG HEADSHOT: INSTANT KILL");
-                        event.setDamage(Math.max(event.getDamage(), target.getHealth()));
-                    } else {
-                        Double d = plugin.getConfig().getDouble("bow.headshot");
-                        plugin.getLogger().info("DEBUG HEADSHOT: DMG x" + d.toString() + "  -> " + event.getDamage() + " => " + (event.getDamage() * d));
-                        if (d > 0) {
-                            event.setDamage(event.getDamage() * d);
-                        }
+                    switch (config.getHeadshot()) {
+                        case CRITICAL:
+                            getLog().debug("HEADSHOT: CRITICAL");
+                            arrow.setCritical(true);
+                            break;
+                        case KILL:
+                            getLog().debug("HEADSHOT: INSTANT KILL");
+                            event.setDamage(Math.max(event.getDamage(), target.getHealth()));
+                            break;
+                        case MULTIPLICATOR:
+                            Double d = config.getMultiplicator();
+                            getLog().debug("HEADSHOT: DMG x" + d.toString() + "  -> " + event.getDamage() + " => " + (event.getDamage() * d));
+                            if (d > 0) {
+                                event.setDamage(event.getDamage() * d);
+                            }
+                            break;
                     }
                 }
             } else {
-                plugin.getLogger().info("DEBUG: NOOO no eyeloc :(");
+                getLog().debug("NOOO no eyeloc :(");
             }
         }
     }
 
-    private boolean doesPierceHead(final LivingEntity target, final Location pierce) {
+    private boolean doesPierceHead(final LivingEntity target, final Location source, final Vector vec) {
         final double size = getHeadSize(target);
-        final Location eye = target.getEyeLocation();
-        if (eye == null)
-            return false;
+        // Raise head center, because I like it so
+        final Location eye = target.getEyeLocation().clone().add(0, 0.2, 0);
+        //debugSphereOuter(eye, size);
 
-        Vector direction = pierce.getDirection().normalize().multiply(0.1);
-        plugin.getLogger().info("DEBUG HEADSHOT DIR: "+direction + "  l:"+direction.length());
-        double distance = eye.distance(pierce);
+        Vector direction = vec.clone().normalize().multiply(0.1);
+        getLog().debug("HEADSHOT DIR: "+direction + "  l:"+direction.length());
+        double distance = eye.distance(source);
 
-        Location loc = pierce.clone();
+        Location loc = source.clone();
         while (distance > size) {
         //for (int i = 0; i < 20; i++) {
-            //if (distance <= size)
-                //break;
+            if (distance <= size)
+                break;
 
-            plugin.getLogger().info("DEBUG HEADSHOT DIST ADD: NOT YET "+distance + "  loc:" + loc);
+            getLog().debug("HEADSHOT DIST ADD: NOT YET "+distance + "  loc:" + loc);
             loc.add(direction);
+            //debugParticleLocation(loc);
             double newdist = eye.distance(loc);
             if (newdist > distance) {
-                plugin.getLogger().info("DEBUG HEADSHOT DIST ADD: NOT YET " + newdist + " > " + distance);
+                getLog().debug("HEADSHOT DIST ADD: NOT YET " + newdist + " > " + distance);
                 break;
             }
             distance = newdist;
         }
 
-        loc = pierce.clone();
+        loc = source.clone();
         while (distance > size) {
         //for (int i = 0; i < 20; i++) {
-            //if (distance <= size)
-                //break;
+            if (distance <= size)
+                break;
 
-            plugin.getLogger().info("DEBUG HEADSHOT DIST SUBTRACT: NOT YET "+distance + "  loc:" + loc);
+            getLog().debug("HEADSHOT DIST SUBTRACT: NOT YET "+distance + "  loc:" + loc);
             loc.subtract(direction);
+            //debugParticleLocation(loc);
             double newdist = eye.distance(loc);
             if (newdist > distance) {
-                plugin.getLogger().info("DEBUG HEADSHOT DIST SUBTRACT: NOT YET "+ newdist + " > " + distance);
+                getLog().debug("HEADSHOT DIST SUBTRACT: NOT YET "+ newdist + " > " + distance);
                 loc.subtract(direction);
                 return false;
             }
             distance = newdist;
         }
-        plugin.getLogger().info("DEBUG HEADSHOT DIST: "+ distance + "  loc:" + loc);
-        return true;
+        getLog().debug("HEADSHOT DIST: "+ distance + "  loc:" + loc);
+        return distance < size;
     }
 
     private double getHeadSize(LivingEntity target) {
         return DEFAULT_HEADSET_DISTANCE;
     }
+
+    /*
+    private void debugParticleLocation(final Location loc) {
+        debugParticleLocation(loc, Effect.FIREWORKS_SPARK);
+    }
+    private void debugParticleLocation(final Location loc, final Effect e) {
+        if (!isDebug())
+            return;
+
+        final Location l = loc.clone();
+        for (int i = 0; i < 60; i++) {
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    for (Player p : loc.getWorld().getPlayers()) {
+                        try {
+                            PacketContainer responsePacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.WORLD_PARTICLES);
+                            responsePacket.getModifier().writeDefaults();
+                            responsePacket.getStrings().write(0, e.getName());
+                            responsePacket.getFloat().write(0, (float) l.getX());
+                            responsePacket.getFloat().write(1, (float) l.getY());
+                            responsePacket.getFloat().write(2, (float) l.getZ());
+                            responsePacket.getFloat().write(3, 0f);
+                            responsePacket.getFloat().write(4, 0f);
+                            responsePacket.getFloat().write(5, 0f);
+                            ProtocolLibrary.getProtocolManager().sendServerPacket(p, responsePacket);
+                        } catch (InvocationTargetException e) {
+                            getLog().debug("ERROR: Couldn't show particle for " + p.getName());
+                        }
+                    }
+                }
+            }, 5L * i);
+        }
+    }
+
+    public void debugSphereOuter(final Location mid, final double r)
+    {
+        if (!isDebug())
+            return;
+
+        for (double x = -1.0; x <= 1.0; x += 0.1) {
+            //double z = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
+            for (double y = -1.0; y <= 1.0; y += 0.1) {
+                //double y = Math.sqrt(Math.pow(r, 2) - Math.pow(x2, 2));
+                double z =  Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2) - Math.pow(y, 2));
+                debugParticleLocation(new Location(mid.getWorld(), mid.getX() + x, mid.getY() + y, mid.getZ() + z), Effect.FLAME);
+                debugParticleLocation(new Location(mid.getWorld(), mid.getX() + x, mid.getY() + y, mid.getZ() - z), Effect.FLAME);
+                debugParticleLocation(new Location(mid.getWorld(), mid.getX() + x, mid.getY() - y, mid.getZ() + z), Effect.FLAME);
+                debugParticleLocation(new Location(mid.getWorld(), mid.getX() + x, mid.getY() - y, mid.getZ() - z), Effect.FLAME);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onProjectileFire(ProjectileLaunchEvent event) {
+        if (event.getEntity() instanceof Arrow) {
+            final Arrow arrow = (Arrow) event.getEntity();
+            debugParticleLocation(arrow.getLocation());
+            debugParticleLocation(arrow.getLocation(), Effect.LAVA_POP);
+            BukkitRunnable task = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (arrow.isDead()) {
+                        this.cancel();
+                    }
+                    debugParticleLocation(arrow.getLocation());
+                }
+            };
+            task.runTaskTimer(plugin, 1L, 0L);
+        }
+    }*/
 }

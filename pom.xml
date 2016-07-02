@@ -8,7 +8,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bukkit.version>1.7.9-R0.2</bukkit.version>
+        <!--<bukkit.version>1.7.9-R0.2</bukkit.version>-->
+        <spigot.version>1.7.10-R0.1-SNAPSHOT</spigot.version>
         <minecraft.version>1.7.10</minecraft.version>
         <protocollib.version>3.7-SNAPSHOT</protocollib.version>
         <vault.version>1.4</vault.version>
@@ -65,11 +66,17 @@
             <artifactId>plib</artifactId>
             <version>${plib.version}</version>
         </dependency>
-        <dependency>
-            <!-- http://dl.bukkit.org/ -->
+        <!--<dependency>
+            <!- - http://dl.bukkit.org/ - ->
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>${bukkit.version}</version>
+        </dependency>-->
+        <dependency>
+            <!-- https://www.spigotmc.org/wiki/spigot-maven/#maven-repository -->
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${spigot.version}</version>
         </dependency>
         <dependency>
             <!-- http://dl.bukkit.org/ -->
