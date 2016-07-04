@@ -55,8 +55,8 @@ public class BowHeadshot extends CoreModule<MineVive> implements Listener {
             if (!arrow.getType().equals(EntityType.ARROW) || !(arrow.getShooter() instanceof Player))
                 return;
             final PlayerProperties playerViveProperties = plugin.getPlayerViveProperties((Player) arrow.getShooter());
-            //if (playerViveProperties == null || !playerViveProperties.isLongbowShooting())
-                //return;
+            if (playerViveProperties == null || !playerViveProperties.isLongbowShooting())
+                return;
 
             final LivingEntity target = (LivingEntity) event.getEntity();
             final Location eyeloc = target.getEyeLocation();
