@@ -50,11 +50,6 @@
             <id>spigot-repo</id>
             <url>http://repo.bukkit.org/content/groups/public</url>
         </repository>
-        <!-- SpigotMC repository -->
-        <repository>
-            <id>spigot-snapshot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots</url>
-        </repository>
         <repository>
             <id>dmulloy2-repo</id>
             <url>http://repo.dmulloy2.net/content/groups/public/</url>

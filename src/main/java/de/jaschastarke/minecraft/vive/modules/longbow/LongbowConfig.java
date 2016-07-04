@@ -91,14 +91,14 @@ public class LongbowConfig extends Configuration implements IConfigurationSubGro
      */
     @IsConfigurationNode(order = 200)
     public Double getMultiplicator() {
-        return (getHeadshot() != null && getHeadshot().equals(HeadshotType.MULTIPLICATOR)) ? config.getDouble("headshot", 1.0d) : null;
+        return (getHeadshot() != null && getHeadshot().equals(HeadshotType.MULTIPLICATOR)) ? config.getDouble("multiplicator", 1.0d) : null;
     }
 
     /**
      * Change headshot reward if target has a helmet
      * either: DROP (to remove helmet) or IGNORE (Minecraft default behavor) or KEEP (keep bonus as above)
      */
-    @IsConfigurationNode(order = 200)
+    @IsConfigurationNode(order = 300)
     public RewardType getHelmet() {
         return RewardType.valueOf(config.getString("helmet", "IGNORE").toUpperCase());
     }

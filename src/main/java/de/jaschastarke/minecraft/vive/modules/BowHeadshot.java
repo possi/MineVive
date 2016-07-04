@@ -1,5 +1,8 @@
 package de.jaschastarke.minecraft.vive.modules;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
 import de.jaschastarke.bukkit.lib.CoreModule;
 import de.jaschastarke.minecraft.vive.MineVive;
 import de.jaschastarke.minecraft.vive.PlayerProperties;
@@ -12,8 +15,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class BowHeadshot extends CoreModule<MineVive> implements Listener {
     private static final double DEFAULT_HEADSET_DISTANCE = 0.3;
@@ -48,21 +55,26 @@ public class BowHeadshot extends CoreModule<MineVive> implements Listener {
             if (!arrow.getType().equals(EntityType.ARROW) || !(arrow.getShooter() instanceof Player))
                 return;
             final PlayerProperties playerViveProperties = plugin.getPlayerViveProperties((Player) arrow.getShooter());
-            if (playerViveProperties == null || !playerViveProperties.isLongbowShooting())
-                return;
+            //if (playerViveProperties == null || !playerViveProperties.isLongbowShooting())
+                //return;
 
             final LivingEntity target = (LivingEntity) event.getEntity();
             final Location eyeloc = target.getEyeLocation();
             if (eyeloc != null) {
-                //debugParticleLocation(eyeloc, Effect.FLAME);
-                //debugParticleLocation(eyeloc, Effect.HEART);
-                //debugParticleLocation(arrow.getLocation(), Effect.FLAME);
-                //debugParticleLocation(arrow.getLocation(), Effect.LAVA_POP);
-                getLog().debug("HEADSHOT FROM: "+arrow.getLocation().toString());
-                getLog().debug("HEADSHOT TO  : "+eyeloc.toString() + "   eh: " + target.getEyeHeight());
-                //getLog().debug("HEADSHOT DIST: "+distance + "  sqrt:" + eyeloc.distanceSquared(arrow.getLocation()) + " t:"+target.getType());
+                if (isDebug()) {
+                    debugParticleLocation(eyeloc, Effect.FLAME);
+                    debugParticleLocation(eyeloc, Effect.HEART);
+                    debugParticleLocation(arrow.getLocation(), Effect.FLAME);
+                    debugParticleLocation(arrow.getLocation(), Effect.LAVA_POP);
+                    getLog().debug("HEADSHOT FROM: " + arrow.getLocation().toString());
+                    getLog().debug("HEADSHOT TO  : " + eyeloc.toString() + "   eh: " + target.getEyeHeight());
+                    //getLog().debug("HEADSHOT DIST: "+distance + "  sqrt:" + eyeloc.distanceSquared(arrow.getLocation()) + " t:"+target.getType());
+                }
                 if (doesPierceHead(target, arrow.getLocation(), arrow.getVelocity())) {
-                    getLog().debug("HEADSHOT!!!");
+                    if (isDebug()) {
+                        getLog().debug("HEADSHOT!!!");
+                        ((Player) arrow.getShooter()).sendMessage("HEADSHOT!!!");
+                    }
                     final ItemStack helmet = target.getEquipment().getHelmet();
                     if (helmet != null && !helmet.getType().equals(Material.AIR)) {
                         getLog().debug("HEADSHOT: HAS HELMET: " + helmet.getType());
@@ -85,12 +97,14 @@ public class BowHeadshot extends CoreModule<MineVive> implements Listener {
                             arrow.setCritical(true);
                             break;
                         case KILL:
+                            Double d = Math.max(event.getDamage(), target.getHealth());
                             getLog().debug("HEADSHOT: INSTANT KILL");
-                            event.setDamage(Math.max(event.getDamage(), target.getHealth()));
+                            getLog().debug("HEADSHOT: INSTANT KILL x" + event.getDamage() + " => " + d + "    (target health: "+target.getHealth()+"/"+target.getMaxHealth()+")");
+                            event.setDamage(d);
                             break;
                         case MULTIPLICATOR:
-                            Double d = config.getMultiplicator();
-                            getLog().debug("HEADSHOT: DMG x" + d.toString() + "  -> " + event.getDamage() + " => " + (event.getDamage() * d));
+                            d = config.getMultiplicator();
+                            getLog().debug("HEADSHOT: DMG x" + d.toString() + "  -> " + event.getDamage() + " => " + (event.getDamage() * d) + "    (target health: "+target.getHealth()+"/"+target.getMaxHealth()+")");
                             if (d > 0) {
                                 event.setDamage(event.getDamage() * d);
                             }
@@ -108,37 +122,39 @@ public class BowHeadshot extends CoreModule<MineVive> implements Listener {
         // Raise head center, because I like it so
         final Location eye = target.getEyeLocation().clone().add(0, 0.2, 0);
         //debugSphereOuter(eye, size);
+        debugCubeOuter(eye, size);
 
         Vector direction = vec.clone().normalize().multiply(0.1);
         getLog().debug("HEADSHOT DIR: "+direction + "  l:"+direction.length());
+        if (inCube(source, eye, size))
+            return true;
         double distance = eye.distance(source);
 
         Location loc = source.clone();
-        while (distance > size) {
-        //for (int i = 0; i < 20; i++) {
-            if (distance <= size)
-                break;
-
-            getLog().debug("HEADSHOT DIST ADD: NOT YET "+distance + "  loc:" + loc);
+        //while (distance > size) {
+        while (!inCube(loc, eye, size)) {
+            if (isDebug()) {
+                getLog().debug("HEADSHOT DIST ADD: NOT YET " + distance + "  loc:" + loc);
+                debugParticleLocation(loc);
+            }
             loc.add(direction);
-            //debugParticleLocation(loc);
             double newdist = eye.distance(loc);
             if (newdist > distance) {
                 getLog().debug("HEADSHOT DIST ADD: NOT YET " + newdist + " > " + distance);
-                break;
+                //break;
+                return false;
             }
             distance = newdist;
         }
 
-        loc = source.clone();
-        while (distance > size) {
-        //for (int i = 0; i < 20; i++) {
-            if (distance <= size)
-                break;
-
-            getLog().debug("HEADSHOT DIST SUBTRACT: NOT YET "+distance + "  loc:" + loc);
+        /*loc = source.clone();
+        //while (distance > size) {
+        while (!inCube(loc, eye, size)) {
+            if (isDebug()) {
+                getLog().debug("HEADSHOT DIST SUBTRACT: NOT YET " + distance + "  loc:" + loc);
+                debugParticleLocation(loc);
+            }
             loc.subtract(direction);
-            //debugParticleLocation(loc);
             double newdist = eye.distance(loc);
             if (newdist > distance) {
                 getLog().debug("HEADSHOT DIST SUBTRACT: NOT YET "+ newdist + " > " + distance);
@@ -146,16 +162,26 @@ public class BowHeadshot extends CoreModule<MineVive> implements Listener {
                 return false;
             }
             distance = newdist;
+        }*/
+        if (isDebug()) {
+            debugParticleLocation(loc);
+            getLog().debug("HEADSHOT DIST: " + distance + "  loc:" + loc);
         }
-        getLog().debug("HEADSHOT DIST: "+ distance + "  loc:" + loc);
-        return distance < size;
+        //return distance < size;
+        //return inCube(loc, eye, size);
+        return true;
+    }
+
+    private boolean inCube(Location point, Location center, double r) {
+        return  point.getX() >= center.getX() - r && point.getX() <= center.getX() + r &&
+                point.getY() >= center.getY() - r && point.getY() <= center.getY() + r &&
+                point.getZ() >= center.getZ() - r && point.getZ() <= center.getZ() + r;
     }
 
     private double getHeadSize(LivingEntity target) {
         return DEFAULT_HEADSET_DISTANCE;
     }
 
-    /*
     private void debugParticleLocation(final Location loc) {
         debugParticleLocation(loc, Effect.FIREWORKS_SPARK);
     }
@@ -164,7 +190,7 @@ public class BowHeadshot extends CoreModule<MineVive> implements Listener {
             return;
 
         final Location l = loc.clone();
-        for (int i = 0; i < 60; i++) {
+        for (int i = 0; i < 30; i++) {
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -189,6 +215,20 @@ public class BowHeadshot extends CoreModule<MineVive> implements Listener {
         }
     }
 
+    public void debugCubeOuter(final Location mid, final double r)
+    {
+        if (!isDebug())
+            return;
+
+        debugParticleLocation(new Location(mid.getWorld(), mid.getX() + r, mid.getY() + r, mid.getZ() + r), Effect.FLAME);
+        debugParticleLocation(new Location(mid.getWorld(), mid.getX() + r, mid.getY() + r, mid.getZ() - r), Effect.FLAME);
+        debugParticleLocation(new Location(mid.getWorld(), mid.getX() + r, mid.getY() - r, mid.getZ() + r), Effect.FLAME);
+        debugParticleLocation(new Location(mid.getWorld(), mid.getX() + r, mid.getY() - r, mid.getZ() - r), Effect.FLAME);
+        debugParticleLocation(new Location(mid.getWorld(), mid.getX() - r, mid.getY() + r, mid.getZ() + r), Effect.FLAME);
+        debugParticleLocation(new Location(mid.getWorld(), mid.getX() - r, mid.getY() + r, mid.getZ() - r), Effect.FLAME);
+        debugParticleLocation(new Location(mid.getWorld(), mid.getX() - r, mid.getY() - r, mid.getZ() + r), Effect.FLAME);
+        debugParticleLocation(new Location(mid.getWorld(), mid.getX() - r, mid.getY() - r, mid.getZ() - r), Effect.FLAME);
+    }
     public void debugSphereOuter(final Location mid, final double r)
     {
         if (!isDebug())
@@ -224,5 +264,5 @@ public class BowHeadshot extends CoreModule<MineVive> implements Listener {
             };
             task.runTaskTimer(plugin, 1L, 0L);
         }
-    }*/
+    }
 }
