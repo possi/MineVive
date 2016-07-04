@@ -13,7 +13,7 @@ import de.jaschastarke.maven.PluginConfigurations;
  * This configuration-file is automatically written when changed via ingame-commands. So any manual added comments are
  * removed.
  *
- * See: http://ci.ja-s.de:8080/job/MineVive/lastSuccessfulBuild/artifact/target/default_config.yml
+ * See: http://ci.ja-s.de:8080/job/MineVive/lastSuccessfulBuild/artifact/target/default_config.yml/*view*
  */
 @ArchiveDocComments
 @PluginConfigurations
